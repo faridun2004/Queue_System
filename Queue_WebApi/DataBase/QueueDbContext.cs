@@ -19,7 +19,7 @@ namespace Queue_WebApi.DataBase
             modelBuilder.Entity<Queue>()
        .HasMany(q => q.Apointments)
        .WithOne(a => a.Queue)
-       .HasForeignKey(a => a.QueueId) // ✔️ Связь через QueueId
+       .HasForeignKey(a => a.QueueId) 
        .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Queue>()
