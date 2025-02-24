@@ -117,11 +117,14 @@ namespace Queue_WebApi.Migrations
                     b.Property<int>("HallId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("HallId");
 
-                    b.ToTable("Queue");
+                    b.ToTable("Queues");
                 });
 
             modelBuilder.Entity("Queue_WebApi.Models.Worker", b =>

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Queue_WebApi.CQRS.Commands;
+using Queue_WebApi.CQRS.Queries.Queues;
 
 namespace Queue_WebApi.Controllers
 {
@@ -12,6 +13,12 @@ namespace Queue_WebApi.Controllers
         public ClientController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+        [HttpGet("by-client/{clientId}")]
+        public async Task<IActionResult> GetByClientId(int clientId)
+        {
+            var result = await _mediator.Send(new GetAppointmentsByClientIdQuery(clientId));
+            return new OkObjectResult(result);
         }
         [HttpPost]
         public async Task<IActionResult> CreateHall([FromBody] CreateClientCommand command)

@@ -41,9 +41,9 @@ namespace Queue_WebApi.CQRS.Handlers
                 {
                     throw new InvalidOperationException("The time slot is already occupied.");
                 }
-                var client = await _dbContext.Clients.FindAsync(new object[] { command.ClientId });
+                var client = await _dbContext.Clients.FindAsync( command.ClientId);
                 if (client == null) throw new Exception("Client not dound");
-                var queue = await _dbContext.Queueas.FindAsync(command.QueueId);
+                var queue = await _dbContext.Queues.FindAsync(command.QueueId);
                 if (queue == null) throw new Exception("queuer not found");
                 var apointment = new Apointment
                 {

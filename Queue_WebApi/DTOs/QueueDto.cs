@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public int HallId { get; set; }
         public string HallName { get; set; }
+        public int Number { get; set; }
         public List<ApointmentDto> Apointments { get; set; }
     }
 }

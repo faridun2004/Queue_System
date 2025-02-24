@@ -11,7 +11,6 @@ namespace Queue_WebApi.DataBase
         public DbSet<Worker> Workers { get; set; }  
         public DbSet<Client>  Clients { get; set; }
         public DbSet<Hall> Halls { get; set; }
-        public DbSet<Queue> Queueas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

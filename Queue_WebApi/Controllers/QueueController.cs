@@ -14,11 +14,18 @@ namespace Queue_WebApi.Controllers
         {
             _mediator = mediator;
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateQueue([FromBody] CreateQueueCommand command)
         {
             var hall = await _mediator.Send(command);
             return new OkObjectResult(hall);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllQueues()
+        {
+            var result = await _mediator.Send(new GetAllQueuesQuery());
+            return Ok(result);
         }
         [HttpGet("{hallId}")]
         public async Task<IActionResult> GetQueueByHallId(int hallId)
