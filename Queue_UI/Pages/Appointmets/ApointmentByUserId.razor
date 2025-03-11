@@ -1,0 +1,91 @@
+﻿@page "/my-appointments"
+@using Queue_UI.Models
+@using Queue_UI.Services
+@inject ITokenProvider TokenProvider
+@inject IHttpAPIProvider _apiProvider
+@inject UserService _userProvider
+@inject IApointmentService _apointmentService
+@inject NavigationManager NavigationManager
+
+<h3>My Appointments</h3>
+
+@if (appointments == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    @foreach (var group in appointments.GroupBy(a => a.StartTime.Date))
+    {
+        <h4 class="mt-3">@group.Key.ToString("yyyy-MM-dd")</h4>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Hall</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var appointment in group)
+                {
+                    <tr>
+                        <td>@appointment.HallName</td>
+                        <td>@appointment.StartTime.ToString("HH:mm")</td>
+                        <td>@appointment.EndTime.ToString("HH:mm")</td>
+                        <td>
+                            <button @onclick="() => DeleteAppointment(appointment.Id)" class="btn btn-danger btn-sm">Delete</button>
+                            <button @onclick="() => EditProduct(appointment.Id)" class="btn btn-primary btn-sm">Edit</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table> 
+}
+@code {
+    private IEnumerable<AppointmentDro>? appointments;
+    private string? errorMessage;
+    private string? successMessage;
+    private async Task DeleteAppointment(Guid id)
+    {
+        try
+        {
+            await _apointmentService.DeleteAppointment(id);
+            appointments = await _apointmentService.GetAllAppointments();
+            successMessage = "Appointment successfully deleted!";
+            NavigationManager.NavigateTo("/my-appointments");
+            errorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting appointment";
+            successMessage = null;
+        }
+    }
+    private void EditProduct(Guid AppointmentId)
+    {
+        NavigationManager.NavigateTo($"/edit-appointment/{AppointmentId.ToString()}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await _userProvider.GetUserIdInToken();
+        if (userId == null)
+        {
+            errorMessage = "User is not authenticated.";
+            return;
+        }
+        var (isSuccess, result, message) = await _apiProvider.GetAsync<AppointmentDro[]>($"api/appointment/user/{userId}");
+
+        if (isSuccess && result != null)
+        {
+            appointments = result;
+        }
+        else
+        {
+            errorMessage = message ?? "Failed to load appointments.";
+        }
+    }
+}}

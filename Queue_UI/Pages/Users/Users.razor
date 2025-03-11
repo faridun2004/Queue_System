@@ -1,0 +1,140 @@
+﻿@page "/users"
+@using Newtonsoft.Json
+@using Queue_UI.Models
+@using Queue_UI.Services
+@using System.Text
+@inject ITokenProvider TokenProvider
+@inject HttpClient HttpClient
+@inject IHttpAPIProvider _apiProvider
+@inject NavigationManager Navigation
+@inject UserService UserService
+
+<h3 class="my-4 text-center text-primary">Users</h3>
+
+@if (users == null)
+{
+    <p><em>Users not found</em></p>
+}
+else
+{
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Group</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var appointment in users)
+                    {
+                        <tr>
+                            <td>@appointment.Name</td>
+                            <td>@appointment.GroupName</td>
+                        <td>
+                            <button @onclick="() => DeleteUser(appointment.Id)" class="btn btn-danger btn-sm">Delete</button>
+                           
+                        </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    <div class="d-flex justify-content-center my-4">
+        <button @onclick="GoToPreviousPage" class="btn btn-outline-primary me-3" disabled="@(!CanGoToPreviousPage)">
+            <i class="bi bi-arrow-left-circle"></i> Previous
+        </button>
+        <span class="align-self-center">Page @currentPage of @totalPages</span>
+        <button @onclick="GoToNextPage" class="btn btn-outline-primary ms-3" disabled="@(!CanGoToNextPage)">
+            Next <i class="bi bi-arrow-right-circle"></i>
+        </button>
+    </div>
+}
+
+
+@code {
+    private IEnumerable<UserDto>? users;
+    private UserDto user = new UserDto();
+    private GroupDto[]? _halls;
+    private string? errorMessage;
+    private string? successMessage;
+
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private int totalPages;
+    private async Task DeleteUser(Guid userId)
+    {
+        successMessage = null;
+        errorMessage = null;
+        try
+        {
+            var (isSuccess, _, message) = await _apiProvider.DeleteAsync<object>($"api/User/{userId}");
+            if (isSuccess)
+            {
+                successMessage = "Зал успешно удален!";
+                await LoadUsers();
+            }
+            else
+            {
+                errorMessage = "Невозможно удалить зал. Возможно, он используется в других данных.";
+            }
+        }
+        catch
+        {
+            errorMessage = "Ошибка при удалении. Попробуйте позже.";
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+        (bool isSuccessStatusCode, _halls, string message) = await _apiProvider.GetAsync<GroupDto[]>("api/groups");
+       
+    }
+    private async Task LoadUsers()
+    {
+        var (isSuccess, allUsers, message) = await _apiProvider.GetAsync<List<UserDto>>("api/user/users");
+
+        if (!isSuccess || allUsers == null || !allUsers.Any())
+        {
+            return;
+        }
+
+        totalPages = (int)Math.Ceiling((double)allUsers.Count / pageSize);
+        users = allUsers.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    }
+    private async Task HandleSubmit()
+    {
+        successMessage = null;
+        errorMessage = null;
+
+
+        var userId = await UserService.GetUserIdInToken();
+        if (userId == null)
+        {
+            errorMessage = "User is not authenticated.";
+            return;
+        }
+    }
+    private bool CanGoToPreviousPage => currentPage > 1;
+    private bool CanGoToNextPage => currentPage < totalPages;
+
+    private async Task GoToPreviousPage()
+    {
+        if (CanGoToPreviousPage)
+        {
+            currentPage--;
+            await LoadUsers();
+        }
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (CanGoToNextPage)
+        {
+            currentPage++;
+            await LoadUsers();
+        }
+    }
+}

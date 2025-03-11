@@ -1,0 +1,100 @@
+﻿@page "/sign-up"
+@using Queue_UI.Models
+@using Queue_UI.Services
+@inject IHttpAPIProvider _apiProvider
+@inject NavigationManager navigationManager
+@inject HttpClient HttpClient
+
+<h3>Регистрация</h3>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <p class="text-success">@successMessage</p>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="text-danger">@errorMessage</p>
+}
+
+<form>
+    <div class="form-group">
+        <label for="FirstName">Name:</label>
+        <input class="form-control" @bind="@registerModel.Name" />
+    </div>
+    <div class="form-group">
+        <label for="Username">Username:</label>
+        <input id="username" class="form-control" @bind="@registerModel.Username" />
+    </div>
+    <div class="form-group">
+        <label for="Password">Password:</label>
+        <input id="password" type="password" class="form-control" @bind="@registerModel.Password" />
+    </div>
+    <div class="form-group">
+        <label for="Group">Group:</label>
+        <select class="form-control" @bind="@registerModel.GroupId" required>
+            @if (_groups!=null && _groups.Length>0)
+            {
+                @foreach (var group in _groups)
+                {
+                    <option value="@group.Id">@group.Name</option>
+                }
+            }
+            else
+            {
+                <option>No groups available</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <button type="button" class="btn btn-primary" @onclick="HandleSubmit">Sign-up</button>
+        <label>If you already have an account </label>
+        <a href="/sign-in">Sign-in</a>
+    </div>
+</form>
+
+@code {
+    private UserDto registerModel = new UserDto();
+    private string? errorMessage;
+    private string? successMessage;
+    private GroupDto[]? _groups;
+   
+    protected override async Task OnInitializedAsync()
+    {
+         (bool isSuccessStatusCode, _groups, string message) = await _apiProvider.GetAsync<GroupDto[]>("api/groups");
+         if(_groups!=null && _groups.Length>0)
+         {
+            registerModel.GroupId = _groups[0].Id;
+         } 
+        
+        else
+        {
+            errorMessage = $"Failed to load groups. Server response: {message}";
+        }
+    }
+    private async Task HandleSubmit()
+    {
+        if (registerModel.GroupId == null || registerModel.GroupId == Guid.Empty)
+        {
+            errorMessage = "Выберите группу перед регистрацией!";
+            return;
+        }
+
+        var response = await HttpClient.PostAsJsonAsync("api/user", registerModel);
+        Console.WriteLine($"Response status: {response.StatusCode}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            successMessage = "Пользователь успешно создан!";
+            errorMessage = null;
+            navigationManager.NavigateTo("/sign-in");
+        }
+        else
+        {
+            errorMessage = "Ошибка при создании пользователя. Попробуйте снова.";
+            successMessage = null;
+        }
+    }
+
+
+}
