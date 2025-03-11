@@ -1,0 +1,65 @@
+﻿@page "/my-appointments"
+@using Queue_UI.Models
+@using Queue_UI.Services
+@inject IHttpAPIProvider _apiProvider
+@inject UserService UserService
+
+<h3>My Appointments</h3>
+
+@if (appointments == null)
+{
+    <p>Loading appointments...</p>
+}
+else if (appointments.Length == 0)
+{
+    <p>No appointments found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Hall</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var appointment in appointments)
+            {
+                <tr>
+                    <td>@appointment.HallName</td>
+                    <td>@appointment.StartTime</td>
+                    <td>@appointment.EndTime</td>
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private AppointmentDro[]? appointments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await UserService.GetUserIdInToken();
+        if (userId == null)
+        {
+            // Handle user not authenticated
+            return;
+        }
+
+        var (isSuccessStatusCode, result, message) = await _apiProvider.GetAsync<AppointmentDro[]>($"api/appointments/user/{userId}");
+
+        if (isSuccessStatusCode && result != null)
+        {
+            appointments = result;
+        }
+        else
+        {
+            // Handle failure to load appointments
+            Console.WriteLine(message);
+        }
+    }
+}

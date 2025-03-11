@@ -1,13 +1,12 @@
 ﻿namespace Queue_WebApi.DTOs
 {
-    public class ApointmentDto
+    public class AppointmentDto
     {
-        public int Id { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public string Description { get; set; }
-        public int ClientId { get; set; }
-        public string ClientName { get; set; }
-        public int QueueId { get; set; }
+        public Guid Id { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string GroupName { get; set; } = string.Empty;
+        public string HallName { get; set; } = string.Empty;
+        public DateTime StartTime { get; set; }= DateTime.UtcNow;
+        public DateTime EndTime { get; set; }=DateTime.UtcNow;
     }
 }

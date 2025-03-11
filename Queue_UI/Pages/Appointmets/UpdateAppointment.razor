@@ -1,0 +1,47 @@
+﻿@page "/update-appointment/{appointmentId}"
+@using Queue_UI.Models
+@using Queue_UI.Services
+@using System.Text.Json
+@inject ITokenProvider TokenProvider
+@inject HttpClient HttpClient
+@inject IHttpAPIProvider _apiProvider
+@inject NavigationManager Navigation
+@inject UserService UserService
+
+<h3>Update Appointment</h3>
+
+
+
+@if (appointment != null)
+{
+    <form>
+        <div class="form-group">
+            <label for="name">First name:</label>
+            <input id="name" class="form-control" @bind="@appointment.StartTime" required />
+        </div>
+        <div class="form-group">
+            <label for="name">Last name:</label>
+            <input id="name" class="form-control" @bind="@appointment.EndTime" required />
+        </div>
+        <button type="button" class="btn btn-primary" @onclick="EditAppointment">Edit Appointment</button>
+    </form>
+}
+
+@code {
+    [Parameter]
+    public string appointmentId { get; set; }  
+
+    private CreateAppointmentDto appointment = new CreateAppointmentDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        (bool isSuccessStatusCode, appointment, string message) = await _apiProvider.GetAsync<CreateAppointmentDto>($"ap/");
+    }
+
+
+    private async Task EditAppointment()
+    {
+        (bool isSuccessStatusCode, string createClient, string message) = await _apiProvider.PutAsync<string>($"client/");
+        Navigation.NavigateTo("/client");
+    }
+}

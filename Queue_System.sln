@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Queue_WebApi", "Queue_WebApi\Queue_WebApi.csproj", "{6C2548B0-8B29-4F80-9BF7-65EEEF2C6AE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appointment_Hall", "Appointment_Hall\Appointment_Hall.csproj", "{A8B3CBD4-E0D9-44E0-BA36-F30CF683C800}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Queue_UI", "Queue_UI\Queue_UI.csproj", "{F4E9FFC0-8BF4-4B47-B1A6-2EB26412FFBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{6C2548B0-8B29-4F80-9BF7-65EEEF2C6AE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C2548B0-8B29-4F80-9BF7-65EEEF2C6AE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C2548B0-8B29-4F80-9BF7-65EEEF2C6AE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8B3CBD4-E0D9-44E0-BA36-F30CF683C800}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8B3CBD4-E0D9-44E0-BA36-F30CF683C800}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8B3CBD4-E0D9-44E0-BA36-F30CF683C800}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8B3CBD4-E0D9-44E0-BA36-F30CF683C800}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4E9FFC0-8BF4-4B47-B1A6-2EB26412FFBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4E9FFC0-8BF4-4B47-B1A6-2EB26412FFBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4E9FFC0-8BF4-4B47-B1A6-2EB26412FFBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4E9FFC0-8BF4-4B47-B1A6-2EB26412FFBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

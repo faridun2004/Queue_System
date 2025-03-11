@@ -1,16 +1,14 @@
 ﻿namespace Queue_WebApi.Models
 {
-    public class Apointment
+    public class Apointment: BaseEntity
     {
-        public int Id { get; set; }
+        public Guid HallId { get; set; }
+        public Hall? Hall { get; set; }
+        public Guid UserId { get; set; }
+        public User? User { get; set; } 
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public string Description { get; set; }
-        public int ClientId { get; set; }
-        public Client Client { get; set; }
-        public int QueueId { get; set; } 
-        public Queue Queue { get; set; }
+        public bool IsExpired { get; set; }
     }
-
 }
 

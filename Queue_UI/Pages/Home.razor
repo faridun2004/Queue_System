@@ -1,0 +1,65 @@
+﻿@page "/"
+@using Queue_UI.Pages
+@using Queue_UI.Models
+@using Queue_UI.Services
+@inject NavigationManager Navigation
+@inject UserService UserService
+@inject IHttpAPIProvider _apiProvider
+
+<div class="container mt-5 text-center">
+    <div class="hero-section p-5 rounded-lg shadow-lg bg-light">
+        <h1 class="display-3 fw-bold text-primary">Добро пожаловать!</h1>
+        <p class="lead">Бронируйте залы легко и быстро.</p>
+        <hr class="my-4">
+        <p>Выберите удобный зал и забронируйте его в пару кликов. У нас всегда актуальная информация.</p>
+    </div>
+</div>
+
+<div class="container mt-5" id="halls">
+    <h2 class="text-center mb-5 text-dark">Доступные залы</h2>
+    <div class="row justify-content-center">
+        @if (_halls != null && _halls.Length > 0)
+        {
+            @foreach (var hall in _halls)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm rounded-lg border-0">
+                        <img style="width:100px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr0n37BIVzYq-24XofYCbRWXUAh_mUYDN7AA&s" alt="Hall Image" width="100">
+
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">@hall.Name</h5>
+                            <p class="card-text text-muted">Идеально подходит для конференций и встреч.</p>
+                            <button class="btn btn-primary btn-lg w-100" @onclick="() => HandleBooking(hall.Id)">Забронировать</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">Залы недоступны.</p>
+        }
+    </div>
+</div>
+
+@code {
+    private HallDto[] _halls;
+
+    protected override async Task OnInitializedAsync()
+    {
+        (bool isSuccess, _halls, string message) = await _apiProvider.GetAsync<HallDto[]>("api/hall");
+    }
+
+    private async Task HandleBooking(Guid hallId)
+    {
+        var userId = await UserService.GetUserIdInToken();
+        if (userId == null)
+        {
+            Navigation.NavigateTo("/sign-in", forceLoad: true);
+        }
+        else
+        {
+            Navigation.NavigateTo($"/create-appointment?hallId={hallId}");
+        }
+    }
+}
