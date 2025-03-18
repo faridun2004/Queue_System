@@ -1,0 +1,216 @@
+﻿@page "/appointments"
+@using Newtonsoft.Json
+@using Queue_UI.Models
+@using Queue_UI.Services
+@using System.Text
+@inject IApointmentService _apointmentService
+@inject ITokenProvider TokenProvider
+@inject HttpClient HttpClient
+@inject IHttpAPIProvider _apiProvider
+@inject NavigationManager Navigation
+@inject UserService UserService
+
+<h3 class="my-4 text-center text-primary">Appointments</h3>
+
+@if (appointments == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (var group in appointments.GroupBy(a => a.StartTime.Date))
+    {
+        <h4 class="mt-3 text-center text-secondary">@group.Key.ToString("yyyy-MM-dd")</h4>
+
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>User</th>
+                        <th>Group</th>
+                        <th>Зал</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var appointment in group)
+                    {
+                        <tr>
+                            <td>@appointment.UserName</td>
+                            <td>@appointment.GroupName</td>
+                            <td>@appointment.HallName</td>
+                            <td>@appointment.StartTime.ToString("HH:mm")</td>
+                            <td>@appointment.EndTime.ToString("HH:mm")</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-center my-4">
+        <button @onclick="GoToPreviousPage" class="btn btn-outline-primary me-3" disabled="@(!CanGoToPreviousPage)">
+            <i class="bi bi-arrow-left-circle"></i> Previous
+        </button>
+        <span class="align-self-center">Page @currentPage of @totalPages</span>
+        <button @onclick="GoToNextPage" class="btn btn-outline-primary ms-3" disabled="@(!CanGoToNextPage)">
+            Next <i class="bi bi-arrow-right-circle"></i>
+        </button>
+    </div>
+}
+
+<h3 class="my-4 text-center">Create Appointment</h3>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success text-center">@successMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger text-center">@errorMessage</div>
+}
+
+<form @onsubmit="HandleSubmit" class="mx-auto w-50">
+    <div class="form-group mb-3">
+        <label for="department" class="form-label">Hall:</label>
+        <select id="department" class="form-select" @bind="@appointment.HallId" required>
+            @if (_halls != null && _halls.Length > 0)
+            {
+                @foreach (var hall in _halls)
+                {
+                    <option value="@hall.Id">@hall.Name</option>
+                }
+            }
+            else
+            {
+                <option>No halls available</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="startTime" class="form-label">Start Time:</label>
+        <input id="startTime" type="datetime-local" class="form-control" @bind="appointment.StartTime" required />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="endTime" class="form-label">End Time:</label>
+        <input id="endTime" type="datetime-local" class="form-control" @bind="appointment.EndTime" required />
+    </div>
+
+    <div class="form-group text-center">
+        <button type="submit" class="btn btn-primary px-4">Create Appointment</button>
+    </div>
+</form>
+
+@code {
+    private IEnumerable<AppointmentDro>? appointments;
+    private AppointmentDro appointment = new AppointmentDro();
+    private HallDto[]? _halls;
+    private string? errorMessage;
+    private string? successMessage;
+
+    private int currentPage = 1;
+    private int pageSize = 5;
+    private int totalPages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAppointments();
+        (bool isSuccessStatusCode, _halls, string message) = await _apiProvider.GetAsync<HallDto[]>("api/hall");
+        if (_halls != null && _halls.Length > 0)
+        {
+            appointment.HallId = _halls[0].Id;
+        }
+        appointment.StartTime = DateTime.Now;
+        appointment.EndTime = DateTime.Now.AddHours(1);
+    }
+    private async Task LoadAppointments()
+    {
+        var allAppointments = await _apointmentService.GetAllAppointments();
+
+        if (allAppointments != null)
+        {
+            var paginatedAppointments = allAppointments
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize);
+
+            appointments = paginatedAppointments;
+            totalPages = (int)Math.Ceiling((double)allAppointments.Count() / pageSize);
+        }
+    }
+    private async Task HandleSubmit()
+    {
+        successMessage = null;
+        errorMessage = null;
+
+        if (appointment.StartTime >= appointment.EndTime)
+        {
+            errorMessage = "Start time must be before end time.";
+            return;
+        }
+
+        var userId = await UserService.GetUserIdInToken();
+        if (userId == null)
+        {
+            errorMessage = "User is not authenticated.";
+            return;
+        }
+
+
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync("api/appointment", appointment);
+            Console.WriteLine($"Response status: {response.StatusCode}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "Appointment successfully created!";
+                errorMessage = null;
+
+                await LoadAppointments();
+
+                appointment = new AppointmentDro
+                    {
+                        StartTime = DateTime.Now,
+                        EndTime = DateTime.Now.AddHours(1)
+                    };
+            }
+            else
+            {
+                errorMessage = "Error creating appointment. Please try again.";
+                successMessage = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error creating appointment: {ex.Message}";
+            successMessage = null;
+        }
+    }
+
+    private bool CanGoToPreviousPage => currentPage > 1;
+    private bool CanGoToNextPage => currentPage < totalPages;
+
+    private async Task GoToPreviousPage()
+    {
+        if (CanGoToPreviousPage)
+        {
+            currentPage--;
+            await LoadAppointments();
+        }
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (CanGoToNextPage)
+        {
+            currentPage++;
+            await LoadAppointments();
+        }
+    }
+}

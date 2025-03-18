@@ -1,0 +1,187 @@
+﻿@page "/groups"
+@using Newtonsoft.Json
+@using Queue_UI.Models
+@using Queue_UI.Services
+@using System.Text
+@inject ITokenProvider TokenProvider
+@inject HttpClient HttpClient
+@inject IHttpAPIProvider _apiProvider
+@inject NavigationManager Navigation
+@inject UserService UserService
+
+<h3 class="my-4 text-center text-primary">Groups</h3>
+
+@if (groups == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (var group in groups)
+    {
+        <div class="card my-3 shadow-lg">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">@group.Name</h5>
+                <div>
+                    <button class="btn btn-warning btn-sm me-2" @onclick="() => EditHall(group.Id)">
+                        <i class="bi bi-pencil"></i> <!-- Иконка редактирования -->
+                    </button>
+                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteGroup(group.Id)">
+                        <i class="bi bi-trash"></i> <!-- Иконка удаления -->
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="d-flex justify-content-center my-4">
+        <button @onclick="GoToPreviousPage" class="btn btn-outline-primary me-3" disabled="@(!CanGoToPreviousPage)">
+            <i class="bi bi-arrow-left-circle"></i> Previous
+        </button>
+        <span class="align-self-center">Page @currentPage of @totalPages</span>
+        <button @onclick="GoToNextPage" class="btn btn-outline-primary ms-3" disabled="@(!CanGoToNextPage)">
+            Next <i class="bi bi-arrow-right-circle"></i>
+        </button>
+    </div>
+}
+
+<h3 class="my-4 text-center">Create Groups</h3>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success text-center">@successMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger text-center">@errorMessage</div>
+}
+
+<form @onsubmit="HandleSubmit" class="mx-auto w-50">
+
+
+    <div class="form-group mb-3">
+        <label for="startTime" class="form-label">Group Name:</label>
+        <input id="startTime" type="text" class="form-control" @bind="group.Name" required />
+    </div>
+    <div class="form-group text-center">
+        <button type="submit" class="btn btn-primary px-4">Create groups</button>
+    </div>
+</form>
+
+@code {
+    private IEnumerable<GroupDto>? groups;
+    private GroupDto group = new GroupDto();
+    private string? errorMessage;
+    private string? successMessage;
+
+    private int currentPage = 1;
+    private int pageSize = 5;
+    private int totalPages;
+
+    private async Task DeleteGroup(Guid groupId)
+    {
+        successMessage = null;
+        errorMessage = null;
+        try
+        {
+            var (isSuccess, _, message) = await _apiProvider.DeleteAsync<object>($"api/Groups/{groupId}");
+            if (isSuccess)
+            {
+                successMessage = "Группа успешно удален!";
+                await LoadHalls();
+            }
+            else
+            {
+                errorMessage = "Невозможно удалить група. Возможно, он используется в других данных.";
+            }
+        }
+        catch
+        {
+            errorMessage = "Ошибка при удалении. Попробуйте позже.";
+        }
+    }
+    private void EditHall(Guid GroupId)
+    {
+        Navigation.NavigateTo($"/edit-groups/{GroupId.ToString()}");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadHalls();
+        group.Name = "Group";
+    }
+
+    private async Task LoadHalls()
+    {
+        var (isSuccess, allGroups, message) = await _apiProvider.GetAsync<List<GroupDto>>("api/groups");
+
+        if (!isSuccess || allGroups == null || !allGroups.Any())
+        {
+            return;
+        }
+        
+        totalPages = (int)Math.Ceiling((double)allGroups.Count / pageSize);
+        groups = allGroups.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    }
+
+
+
+    private async Task HandleSubmit()
+    {
+        successMessage = null;
+        errorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(group.Name))
+        {
+            errorMessage = "Name cannot be empty.";
+            return;
+        }
+
+        try
+        {
+            var (isSuccess, _, message) = await _apiProvider.PostAsync<object>("api/groups", group);
+
+
+            if (isSuccess)
+            {
+                successMessage = "Hall successfully created!";
+                errorMessage = null;
+
+                await LoadHalls();
+
+                group = new GroupDto { Name = string.Empty };
+            }
+            else
+            {
+                errorMessage = $"Error creating hall: {message}";
+                successMessage = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error creating hall: {ex.Message}";
+            successMessage = null;
+        }
+    }
+
+
+    private bool CanGoToPreviousPage => currentPage > 1;
+    private bool CanGoToNextPage => currentPage < totalPages;
+
+    private async Task GoToPreviousPage()
+    {
+        if (CanGoToPreviousPage)
+        {
+            currentPage--;
+            await LoadHalls();
+        }
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (CanGoToNextPage)
+        {
+            currentPage++;
+            await LoadHalls();
+        }
+    }
+}

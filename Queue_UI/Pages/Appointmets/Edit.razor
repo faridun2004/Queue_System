@@ -1,0 +1,143 @@
+﻿@page "/edit-appointment/{AppointmentId:guid}"
+@using Queue_UI.Models
+@using Queue_UI.Services
+@using System.Text.Json
+@inject ITokenProvider TokenProvider
+@inject HttpClient HttpClient
+@inject IHttpAPIProvider _apiProvider
+@inject NavigationManager Navigation
+@inject UserService UserService
+
+<h3>Edit Appointment</h3>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<form @onsubmit="HandleSubmit">
+    <div class="form-group">
+        <label for="department">Hall:</label>
+        <select id="department" class="form-control" @bind="@appointment.HallId" required>
+            @if (_halls != null && _halls.Length > 0)
+            {
+                @foreach (var hall in _halls)
+                {
+                    <option value="@hall.Id">@hall.Name</option>
+                }
+            }
+            else
+            {
+                <option>No halls available</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="startTime">Start Time:</label>
+        <input id="startTime" type="datetime-local" class="form-control" @bind="appointment.StartTime" required />
+    </div>
+
+    <div class="form-group">
+        <label for="endTime">End Time:</label>
+        <input id="endTime" type="datetime-local" class="form-control" @bind="appointment.EndTime" required />
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Update Appointment</button>
+        <button type="button" class="btn btn-secondary ms-2" @onclick="GoBack">Отмена</button>
+    </div>
+</form>
+
+@code {
+    [Parameter] public Guid AppointmentId { get; set; } // ID записи для редактирования
+    private AppointmentDro appointment = new AppointmentDro();
+    private HallDto[]? _halls;
+    private string? errorMessage;
+    private string? successMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Получаем данные для всех залов
+        (bool isSuccessStatusCode, _halls, string message) = await _apiProvider.GetAsync<HallDto[]>("api/hall");
+
+        // Получаем UserId из токена
+        var userId = await UserService.GetUserIdInToken();
+        if (userId == null)
+        {
+            errorMessage = "User is not authenticated.";
+            return;
+        }
+
+        // Получаем данные для редактируемой записи по UserId
+        var response = await HttpClient.GetAsync($"api/appointment/user/{userId.Value}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var appointments = await response.Content.ReadFromJsonAsync<AppointmentDro[]>();
+            appointment = appointments.FirstOrDefault(a => a.Id == AppointmentId);
+        }
+        else
+        {
+            errorMessage = "Appointment not found or access denied.";
+            return;
+        }
+
+        // Если есть данные о залах, устанавливаем первый
+        if (_halls != null && _halls.Length > 0)
+        {
+            appointment.HallId = _halls[0].Id; // Устанавливаем значение по умолчанию
+        }
+    }
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/my-appointments");
+    }
+    private async Task HandleSubmit()
+    {
+        successMessage = null;
+        errorMessage = null;
+
+        if (appointment.StartTime >= appointment.EndTime)
+        {
+            errorMessage = "Start time must be before end time.";
+            return;
+        }
+
+        var userId = await UserService.GetUserIdInToken();
+        if (userId == null)
+        {
+            errorMessage = "User is not authenticated.";
+            return;
+        }
+
+        appointment.UserId = userId.Value;
+
+        try
+        {
+            // Отправка запроса на обновление записи
+            var response = await HttpClient.PutAsJsonAsync($"api/appointment/user/{userId.Value}/update/{AppointmentId}", appointment);
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "Appointment successfully updated!";
+                errorMessage = null;
+            }
+            else
+            {
+                errorMessage = "Error updating appointment. Please try again.";
+                successMessage = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error updating appointment: {ex.Message}";
+            successMessage = null;
+        }
+    }
+}

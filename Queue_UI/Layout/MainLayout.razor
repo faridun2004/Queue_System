@@ -1,0 +1,55 @@
+﻿@using Queue_UI.Services
+@using Microsoft.AspNetCore.Components.Routing
+@inject ITokenProvider tokenProvider
+@inject NavigationManager navigationManager
+@inject UserService userService
+@inherits LayoutComponentBase
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        @if (tokenProvider.IsAuthenticated)
+        {
+            <div class="top-row px-4">
+                <button type="button" class="btn btn-primary" @onclick="Logout">Выход</button>
+
+                <button type="button" class="btn btn-secondary" @onclick="GoToEditProfile">
+                    <i class="fas fa-user-edit"></i>
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="top-row px-4">
+                <a href="/sign-in">Вход</a>
+            </div>
+        }
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private void Logout()
+    {
+        tokenProvider.Logout();
+        navigationManager.NavigateTo("/", true);
+    }
+
+    private void GoToEditProfile()
+    {
+        var userId = userService.GetUserIdInToken(); 
+        if (userId != null)
+        {
+            navigationManager.NavigateTo($"/update-profile");
+        }
+        else
+        {
+            navigationManager.NavigateTo("/sign-in");
+        }
+    }
+}

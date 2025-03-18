@@ -1,0 +1,170 @@
+/* Общий стиль */
+html, body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; /* Легкий фон */
+    color: #333;
+}
+
+/* Заголовок и основные элементы */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    color: #1a1a1a;
+}
+
+a, .btn-link {
+    color: #3498db;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+}
+
+    a:hover, .btn-link:hover {
+        color: #1d73a4;
+    }
+
+/* Кнопки */
+.btn-primary {
+    color: white;
+    background-color: #3498db;
+    border-color: #2980b9;
+    border-radius: 50px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+
+/* Формы */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+input, select {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+    input:focus, select:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+
+/* Ошибки */
+.invalid {
+    border: 1px solid #e74c3c;
+    background-color: #f2d7d5;
+}
+
+.validation-message {
+    color: #e74c3c;
+    font-size: 0.875rem;
+}
+
+/* Прогресс загрузки */
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 80px;
+    height: 80px;
+    margin: 20vh auto;
+}
+
+    .loading-progress circle {
+        fill: none;
+        stroke: #e0e0e0;
+        stroke-width: 6;
+        transform-origin: 50% 50%;
+        transform: rotate(-90deg);
+    }
+
+        .loading-progress circle:last-child {
+            stroke: #3498db;
+            stroke-dasharray: 251.327, 500%;
+            animation: spin 1.5s infinite ease-in-out;
+        }
+
+@keyframes spin {
+    0% {
+        stroke-dasharray: 0, 500%;
+    }
+
+    100% {
+        stroke-dasharray: 251.327, 500%;
+    }
+}
+
+.loading-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #3498db;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Стиль ошибок */
+#blazor-error-ui {
+    background: #e74c3c;
+    color: white;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    z-index: 1000;
+    display: none;
+    text-align: center;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        font-size: 1.5rem;
+    }
+
+    #blazor-error-ui .reload {
+        font-weight: bold;
+        color: white;
+        margin-left: 1rem;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+        #blazor-error-ui .reload:hover {
+            color: #3498db;
+        }
+
+/* Стиль карточек */
+.card-img-top {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+    .card-img-top:hover {
+        transform: scale(1.05);
+    }
+
+/* Стили для других элементов */
+.container {
+    padding: 30px;
+}
+
+h1 {
+    color: #1a1a1a;
+    text-align: center;
+    font-size: 2.5rem;
+}

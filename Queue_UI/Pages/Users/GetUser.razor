@@ -1,0 +1,37 @@
+﻿@page "/User-info"
+@using Queue_UI.Models
+@using Queue_UI.Services
+@inject UserService MyApiService
+@inject IHttpAPIProvider _apiProvider
+
+<h3>User information</h3>
+
+@if (userId == null)
+{
+    <p>Loading......</p>
+}
+else
+{
+    <p>Your Name: @Name</p>
+    <p>Group Name: @UserGroupName</p>
+    <p><a href="/update-profile">Edit</a></p>
+}
+
+@code {
+    private Guid? userId;
+    UserDto user = new UserDto();
+    private string? Name;
+    private string? UserGroupName;
+    protected override async Task OnInitializedAsync()
+    {
+        userId = await MyApiService.GetUserIdInToken();
+        var response = await _apiProvider.GetAsync<UserDto>($"api/user/{userId}");
+        if (response.isSuccessStatusCode)
+        {
+            user = response.result;
+            Name = user.Name ?? string.Empty;
+            UserGroupName = user.GroupName;
+
+        }
+    }
+}
