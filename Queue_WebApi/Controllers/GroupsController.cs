@@ -20,34 +20,69 @@ namespace Queue_WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateGroup([FromBody] CreateGroupCommand command)
         {
-            var groupId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetGroupById), new { id = groupId }, groupId);
+            try
+            {
+                var groupId = await _mediator.Send(command);
+                return CreatedAtAction(nameof(GetGroupById), new { id = groupId }, groupId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllGroups()
         {
-            var groups = await _mediator.Send(new GetGroups());
-            return Ok(groups);
+            try
+            {
+                var groups = await _mediator.Send(new GetGroups());
+                return Ok(groups);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetGroupById(Guid id)
         {
-            var group = await _mediator.Send(new GetGroupById(id));
-            return Ok(group);
+            try
+            {
+                var group = await _mediator.Send(new GetGroupById(id));
+                return Ok(group);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPut]
         public async Task<IActionResult> UpdateGroup([FromBody] UpdateGroupCommand command)
         {
-            await _mediator.Send(command);
-            return Ok();
+            try
+            {
+                await _mediator.Send(command);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGroup(Guid id)
         {
-            await _mediator.Send(new DeleteGroupCommand(id));
-            return NoContent();
+            try
+            {
+                await _mediator.Send(new DeleteGroupCommand(id));
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

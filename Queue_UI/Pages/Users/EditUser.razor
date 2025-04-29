@@ -106,7 +106,6 @@
                 return;
             }
 
-            // Update the user data via API
             var response = await HttpClient.PutAsJsonAsync($"api/User/{userId}", user);
 
             if (response.IsSuccessStatusCode)

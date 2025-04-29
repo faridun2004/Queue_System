@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using Queue_UI.Models;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Queue_UI.Services
 {
@@ -13,6 +15,7 @@ namespace Queue_UI.Services
             _httpClient = httpClient;
             _tokenProvider = tokenProvider;
         }
+       
         public async Task DeleteAppointment(Guid appointmentId)
         {
             var id = await GetUserIdInToken();

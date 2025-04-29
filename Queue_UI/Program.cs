@@ -1,6 +1,8 @@
 using Blazored.LocalStorage;
+using Blazored.Modal;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor.Services;
 using Queue_UI;
 using Queue_UI.Services;
 
@@ -13,6 +15,7 @@ builder.Services.AddHttpClient("ServerAPI", client => client.BaseAddress = serve
 builder.Services.AddScoped<IApointmentService, ApointmentService>();
 builder.Services.AddScoped<IHttpAPIProvider, HttpAPIProvider>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
+
 builder.Services.AddScoped<UserService>();
 
 builder.Services.AddBlazoredLocalStorageAsSingleton();

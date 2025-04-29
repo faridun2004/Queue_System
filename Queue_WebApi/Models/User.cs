@@ -6,6 +6,7 @@ namespace Queue_WebApi.Models
     public class User : BaseEntity
     {
         public string? Name { get; set; }
+        public string? KeyWord { get; set; }
         public Guid GroupId { get; set; }
         public Group? Group { get; set; }
         public string? Username { get; set; }

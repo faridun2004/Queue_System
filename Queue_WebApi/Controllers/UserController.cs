@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Queue_WebApi.CQRS.Users.Commands;
 using Queue_WebApi.CQRS.Users.Queries;
+using Queue_WebApi.DTOs;
 
 namespace Queue_WebApi.Controllers
 {
@@ -11,6 +13,7 @@ namespace Queue_WebApi.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
+
         private readonly IMediator _mediator;
         public UserController(IMediator mediator)
         {
@@ -37,12 +40,12 @@ namespace Queue_WebApi.Controllers
             return Ok(userId.ToString());
         }
 
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteUser(Guid id)
-        //{
-        //    await _mediator.Send(new DeleteUserCommand(id));
-        //    return NoContent();
-        //}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            await _mediator.Send(new DeleteUserCommand(id));
+            return NoContent();
+        }
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserCommand command)
         {
@@ -50,5 +53,21 @@ namespace Queue_WebApi.Controllers
             await _mediator.Send(updatedCommand);
             return NoContent();
         }
+        [AllowAnonymous]
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequests request)
+        {
+            try
+            {
+                var command = new ForgotPasswordCommand(request.KeyWord, request.UserName);
+                var newPassword = await _mediator.Send(command);
+                return Ok(new { NewPassword = newPassword });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

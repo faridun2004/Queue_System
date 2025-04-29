@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Queue_WebApi.CQRS.Users.Commands;
 using Queue_WebApi.Persistence.DataBase;
 
@@ -15,10 +16,20 @@ namespace Queue_WebApi.CQRS.Users.Handlers
 
         public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _context.Users.FindAsync(request.UserId , cancellationToken);
+            var user = await _context.Users.FindAsync(request.UserId, cancellationToken);
 
             if (user == null)
+            {
                 throw new KeyNotFoundException("User not found");
+            }
+            var existingUser = await _context.Users
+                .Where(u => u.Username == request.Username && u.Id != request.UserId) 
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (existingUser != null)
+            {
+                throw new InvalidOperationException("Имя пользователя уже занято.");
+            }
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
             user.Username = request.Username;
             user.Password = hashedPassword;
@@ -27,5 +38,6 @@ namespace Queue_WebApi.CQRS.Users.Handlers
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
+
 
 }

@@ -2,5 +2,5 @@
 
 namespace Queue_WebApi.CQRS.Users.Commands
 {
-    public record DeleteUserCommand() : IRequest;
+    public record DeleteUserCommand(Guid id) : IRequest<bool>;
 }

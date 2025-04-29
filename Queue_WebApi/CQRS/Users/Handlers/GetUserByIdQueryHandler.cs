@@ -19,10 +19,10 @@ namespace Queue_WebApi.CQRS.Users.Handlers
         {
             var user = await _context.Users
                 .Include(u => u.Group)
-                .Where(v => !v.IsDeleted)
+                .Where(v => v.IsDeleted==false)
                 .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
-            if (user == null)
+            if (user == null )
                 throw new KeyNotFoundException("User not found");
 
             return new UserDto

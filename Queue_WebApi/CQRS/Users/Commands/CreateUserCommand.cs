@@ -6,6 +6,7 @@ namespace Queue_WebApi.CQRS.Users.Commands
         string Username,
         string Password,
         string Name,
+        string KeyWord,   
         Guid GroupId
         ) : IRequest<Guid>;
 

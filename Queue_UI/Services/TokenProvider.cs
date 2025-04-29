@@ -2,6 +2,7 @@
 using Blazored.LocalStorage;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Net.Http;
 
 namespace Queue_UI.Services
 {
@@ -17,7 +18,7 @@ namespace Queue_UI.Services
             _localStorage = localStorage;
             LoadTokenInfo();
         }
-
+        
         public bool IsAuthenticated { get; private set; }
 
         private bool IsTokenExpired => token == null || token.ExpireTime < DateTimeOffset.Now;

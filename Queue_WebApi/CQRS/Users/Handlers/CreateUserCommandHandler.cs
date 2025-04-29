@@ -38,6 +38,7 @@ namespace Queue_WebApi.CQRS.Users.Handlers
                 Username = request.Username,
                 Password = hashedPassword,
                 Name = request.Name,
+                KeyWord = request.KeyWord,
                 GroupId = request.GroupId,
                 Role = "user",
                 CreatedAt = DateTime.Now

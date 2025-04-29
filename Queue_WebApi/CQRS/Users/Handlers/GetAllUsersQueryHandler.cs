@@ -18,10 +18,9 @@ namespace Queue_WebApi.CQRS.Users.Handlers
         {
             var users = await _context.Users
                 .Include(u => u.Group)
-                .Where(a => !a.IsDeleted)
                 .ToListAsync(cancellationToken);
 
-            return users.Where(a => a.Role == "user")
+            return users.Where(a => a.Role == "user" && a.IsDeleted==false)
                 .Select(u => new UserDto
                 {
                     Id = u.Id,

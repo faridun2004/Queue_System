@@ -6,7 +6,6 @@ namespace Queue_WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-
     public class AuthController : ControllerBase
     {
         protected readonly AuthService _authService;
@@ -14,6 +13,7 @@ namespace Queue_WebApi.Controllers
         {
             _authService = authService;
         }
+   
         [HttpPost("Token")]
         public async Task<IActionResult> LogIn(string username, string password)
         {
@@ -27,7 +27,6 @@ namespace Queue_WebApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
         [HttpPost("RefreshToken")]
         public async Task<IActionResult> RefreshToken(string refreshToken)
         {
