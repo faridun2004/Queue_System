@@ -11,17 +11,16 @@ namespace Queue_WebApi.Persistence.DataBase
         {
             _httpContextAccessor=httpContextAccessor;
         }
-      
+    
         public DbSet<Apointment> Apointsments { get; set; }
         public DbSet<Hall> Halls { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new AppointmentConfiguration());
-            modelBuilder.ApplyConfiguration(new HallConfiguration());
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
-            modelBuilder.ApplyConfiguration(new GroupConfiguration());
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(QueueDbContext).Assembly);
+            modelBuilder.Entity<Apointment>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<User>().HasQueryFilter(u=> !u.IsDeleted);
         }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellation=default)
         {

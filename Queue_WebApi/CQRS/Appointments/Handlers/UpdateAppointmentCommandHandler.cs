@@ -16,7 +16,7 @@ namespace Queue_WebApi.CQRS.Appointments.Handlers
 
         public async Task<bool> Handle(UpdateAppointmentCommand request, CancellationToken cancellationToken)
         {
-            var appointment = await _context.Apointsments.FindAsync(request.AppointmentId);
+            var appointment = await _context.Apointsments.FindAsync(request.AppointmentId,cancellationToken);
             if (appointment == null || appointment.UserId != request.UserId)
                 return false;
 
@@ -54,10 +54,6 @@ namespace Queue_WebApi.CQRS.Appointments.Handlers
             }
         }
     }
-
-
-
-
 }
 
 

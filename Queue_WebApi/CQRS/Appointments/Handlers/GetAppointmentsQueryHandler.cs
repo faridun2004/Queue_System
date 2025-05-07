@@ -20,7 +20,6 @@ namespace Queue_WebApi.CQRS.Appointments.Handlers
                 .Include(a => a.Hall)
                 .Include(a => a.User)
                 .ThenInclude(u => u.Group)
-                .Where(a => !a.IsDeleted)
                 .Where(a => a.EndTime > DateTime.Now)
                 .Select(a => new AppointmentDto
                 {

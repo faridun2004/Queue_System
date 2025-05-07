@@ -16,8 +16,8 @@ namespace Queue_WebApi.CQRS.Appointments.Handlers
 
         public async Task<bool> Handle(DeleteAppointmentCommand request, CancellationToken cancellationToken)
         {
-            var appointment = await _context.Apointsments.Where(appointment => !appointment.IsDeleted)
-                .FirstOrDefaultAsync(a => a.UserId == request.UserId, cancellationToken);
+            var appointment = await _context.Apointsments
+                .FirstOrDefaultAsync(a => a.Id == request.AppointmentId && a.UserId == request.UserId, cancellationToken);
             if (appointment == null)
             {
                 throw new KeyNotFoundException("Appointment not found");

@@ -9,5 +9,4 @@ namespace Queue_WebApi.CQRS.Users.Commands
         string KeyWord,   
         Guid GroupId
         ) : IRequest<Guid>;
-
 }
