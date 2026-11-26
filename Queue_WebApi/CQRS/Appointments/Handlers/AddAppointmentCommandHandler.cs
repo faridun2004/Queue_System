@@ -57,7 +57,7 @@ namespace Queue_WebApi.CQRS.Appointments.Handlers
                     UserId = userId.Value,
                     StartTime = command.StartTime,
                     EndTime = command.EndTime,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _dbContext.Apointsments.Add(appointment);

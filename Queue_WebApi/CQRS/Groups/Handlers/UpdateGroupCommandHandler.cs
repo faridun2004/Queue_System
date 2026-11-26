@@ -18,11 +18,11 @@ namespace Queue_WebApi.CQRS.Groups.Handlers
             if (group == null)
                 throw new KeyNotFoundException("Group not found");
             group.Name = request.Name;
-            group.UpdatedAt = DateTime.Now;
+            group.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync(cancellationToken);
             return new GroupDto
             {
-                Id= group.Id,
+                Id = group.Id,
                 Name = group.Name
             };
         }

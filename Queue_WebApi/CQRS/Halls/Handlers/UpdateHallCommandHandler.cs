@@ -21,13 +21,13 @@ namespace Queue_WebApi.CQRS.Halls.Handlers
                 throw new KeyNotFoundException("Hall not found");
 
             hall.Name = request.Name;
-            hall.UpdatedAt = DateTime.Now;
+            hall.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync(cancellationToken);
-            return  new HallDto
+            return new HallDto
             {
                 Id = hall.Id,
                 Name = hall.Name
-            };  
+            };
         }
     }
 }

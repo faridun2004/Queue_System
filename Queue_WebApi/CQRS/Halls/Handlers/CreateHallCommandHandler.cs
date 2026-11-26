@@ -5,7 +5,7 @@ using Queue_WebApi.Persistence.DataBase;
 
 namespace Queue_WebApi.CQRS.Halls.Handlers
 {
-    public class CreateHallCommandHandler: IRequestHandler<CreateHallCommand, Guid>
+    public class CreateHallCommandHandler : IRequestHandler<CreateHallCommand, Guid>
     {
         private readonly QueueDbContext _context;
         public CreateHallCommandHandler(QueueDbContext context)
@@ -17,11 +17,11 @@ namespace Queue_WebApi.CQRS.Halls.Handlers
             var hall = new Hall
             {
                 Name = request.Name,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
 
             };
             _context.Halls.Add(hall);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return hall.Id;
         }
     }

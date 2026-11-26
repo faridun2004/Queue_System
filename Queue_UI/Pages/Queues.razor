@@ -126,8 +126,8 @@ else
         {
             appointment.HallId = _halls[0].Id;
         }
-        appointment.StartTime = DateTime.Now;
-        appointment.EndTime = DateTime.Now.AddHours(1);
+        appointment.StartTime = DateTime.UtcNow;
+        appointment.EndTime = DateTime.UtcNow.AddHours(1);
     }
     private async Task LoadAppointments()
     {
@@ -176,8 +176,8 @@ else
 
                 appointment = new AppointmentDro
                     {
-                        StartTime = DateTime.Now,
-                        EndTime = DateTime.Now.AddHours(1)
+                        StartTime = DateTime.UtcNow,
+                        EndTime = DateTime.UtcNow.AddHours(1)
                     };
             }
             else

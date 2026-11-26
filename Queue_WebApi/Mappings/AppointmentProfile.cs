@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using Queue_WebApi.CQRS.Appointments.Commands.CreateAppointments;
-using Queue_WebApi.CQRS.Appointments.Commands.UpdateAppointments;
-using Queue_WebApi.DTOs;
 using Queue_WebApi.Models;
 
 namespace Queue_WebApi.Mappings
@@ -12,7 +10,7 @@ namespace Queue_WebApi.Mappings
         {
             CreateMap<AddAppointmentCommand, Apointment>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now));
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
         }
     }
 }

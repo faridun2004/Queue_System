@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Queue_WebApi.CQRS.Groups.Commands;
-using Queue_WebApi.DTOs;
 using Queue_WebApi.Models;
 using Queue_WebApi.Persistence.DataBase;
 
@@ -19,7 +18,7 @@ namespace Queue_WebApi.CQRS.Groups.Handlers
             {
                 Id = Guid.NewGuid(),
                 Name = command.Name,
-                CreatedAt=DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
             };
             _context.Groups.Add(group);
             await _context.SaveChangesAsync(cancellationToken);

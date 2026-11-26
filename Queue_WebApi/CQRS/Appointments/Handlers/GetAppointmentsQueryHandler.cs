@@ -20,7 +20,7 @@ namespace Queue_WebApi.CQRS.Appointments.Handlers
                 .Include(a => a.Hall)
                 .Include(a => a.User)
                 .ThenInclude(u => u.Group)
-                .Where(a => a.EndTime > DateTime.Now)
+                .Where(a => a.EndTime > DateTime.UtcNow)
                 .Select(a => new AppointmentDto
                 {
                     UserName = a.User.Name,

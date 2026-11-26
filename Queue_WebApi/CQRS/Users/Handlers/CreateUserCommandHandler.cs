@@ -41,7 +41,7 @@ namespace Queue_WebApi.CQRS.Users.Handlers
                 KeyWord = request.KeyWord,
                 GroupId = request.GroupId,
                 Role = "user",
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
