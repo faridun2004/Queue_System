@@ -1,0 +1,15 @@
+
+services:
+  api:
+    build:
+      context: ./Queue_WebApi
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
+  ui:
+    build:
+      context: ./Queue_UI
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
