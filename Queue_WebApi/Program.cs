@@ -52,6 +52,7 @@ internal class Program
                 { securityScheme, new List<string>() }
                     });
         });
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowAll", builder =>

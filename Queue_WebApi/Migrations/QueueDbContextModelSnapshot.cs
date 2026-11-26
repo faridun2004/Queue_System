@@ -138,9 +138,6 @@ namespace Queue_WebApi.Migrations
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("GroupId1")
-                        .HasColumnType("uuid");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -176,8 +173,6 @@ namespace Queue_WebApi.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.HasIndex("GroupId1");
-
                     b.ToTable("Users");
                 });
 
@@ -203,14 +198,10 @@ namespace Queue_WebApi.Migrations
             modelBuilder.Entity("Queue_WebApi.Models.User", b =>
                 {
                     b.HasOne("Queue_WebApi.Models.Group", "Group")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("Queue_WebApi.Models.Group", null)
-                        .WithMany("Users")
-                        .HasForeignKey("GroupId1");
 
                     b.Navigation("Group");
                 });

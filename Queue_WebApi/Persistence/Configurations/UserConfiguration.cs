@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Queue_WebApi.Models;
 
 namespace Queue_WebApi.Persistence.Configurations
@@ -19,9 +19,9 @@ namespace Queue_WebApi.Persistence.Configurations
                 .HasMaxLength(100);
 
             builder.HasOne(u => u.Group)
-                .WithMany()
+                .WithMany(g => g.Users)
                 .HasForeignKey(u => u.GroupId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 
